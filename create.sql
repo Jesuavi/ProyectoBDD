@@ -2,7 +2,7 @@
 CREATE DOMAIN tipo_postgrado AS VARCHAR(15)
     CHECK (VALUE IN ('especializacion','maestria','doctorado'));
 
-CREATE DOMAIN modalidad AS VARCHAR(10)
+CREATE DOMAIN modalidad AS VARCHAR(20)
     CHECK (VALUE IN ('presencial','virtual','hibrida'));
 
 CREATE DOMAIN tipo_asignatura AS VARCHAR(15)
@@ -17,24 +17,24 @@ CREATE DOMAIN estado_academico AS VARCHAR(15)
 CREATE DOMAIN estado_inscripcion AS VARCHAR(15)
     CHECK (VALUE IN ('inscrito','retirado','aprobado','reprobado'));
 
-CREATE DOMAIN estado_factura AS VARCHAR(10)
+CREATE DOMAIN estado_factura AS VARCHAR(20)
     CHECK (VALUE IN ('pagada','pendiente','vencida'));
 
-CREATE DOMAIN metodo_pago AS VARCHAR(10)
+CREATE DOMAIN metodo_pago AS VARCHAR(20)
     CHECK (VALUE IN ('efectivo','tarjeta','transferencia','mixto'));
 
-CREATE DOMAIN tipo_evaluacion AS VARCHAR(10)
+CREATE DOMAIN tipo_evaluacion AS VARCHAR(20)
     CHECK (VALUE IN ('parcial','practica','proyecto'));
 
-CREATE DOMAIN tipo_aula AS VARCHAR(10)
+CREATE DOMAIN tipo_aula AS VARCHAR(20)
     CHECK (VALUE IN ('auditorio','salon','laboratorio'));
 
-CREATE DOMAIN sexo AS VARCHAR(10)
+CREATE DOMAIN sexo AS VARCHAR(20)
     CHECK (VALUE IN ('masculino','femenino','N/A'));
 
 -- PERSONA
 CREATE TABLE persona(
-    ci INTEGER NOT NULL,
+    ci BIGINT NOT NULL,
     nombre VARCHAR(20) NOT NULL,
     apellido VARCHAR(20) NOT NULL,
     fecha_nac DATE NOT NULL,
@@ -45,45 +45,49 @@ CREATE TABLE persona(
 );
 
 CREATE TABLE estudiante(
-    ciEstudiante INTEGER NOT NULL,
-    nro_carnet INTEGER NOT NULL,
+    ciEstudiante BIGINT NOT NULL,
+    nro_carnet BIGINT NOT NULL,
     sexo sexo NOT NULL,
     estado_ac estado_academico NOT NULL,
-    parentesco VARCHAR(10),
+    ciRep BIGINT,
+    parentesco VARCHAR(20),
 
     CONSTRAINT PK_estudiante PRIMARY KEY (ciEstudiante),
-    CONSTRAINT FK_estudiante_persona FOREIGN KEY (ciEstudiante) REFERENCES persona(ci)
+    CONSTRAINT FK_estudiante_persona FOREIGN KEY (ciEstudiante) REFERENCES persona(ci),
+    CONSTRAINT FK_estudiante_representante FOREIGN KEY (ciRep) REFERENCES persona(ci)
 );
 
 CREATE TABLE personal(
-    ciPersonal INTEGER NOT NULL,
+    ciPersonal BIGINT NOT NULL,
     fecha_EmpTrabajar DATE NOT NULL,
 
     CONSTRAINT PK_personal PRIMARY KEY (ciPersonal),
     CONSTRAINT FK_personal_persona FOREIGN KEY (ciPersonal) REFERENCES persona(ci)
 );
 
+CREATE TABLE profesor(
+    ciProfesor BIGINT NOT NULL,
+
+    CONSTRAINT PK_profesor PRIMARY KEY (ciProfesor),
+    -- FKs
+    CONSTRAINT FK_profesor_persona FOREIGN KEY (ciProfesor) REFERENCES personal(ciPersonal)
+);
+
 -- TABLA FACULTAD
 CREATE TABLE facultad(
     codigoFacultad SERIAL,
     nombre VARCHAR(20) NOT NULL,
+    ci BIGINT NOT NULL,
 
-    CONSTRAINT PK_facultad PRIMARY KEY (codigoFacultad)
+    CONSTRAINT PK_facultad PRIMARY KEY (codigoFacultad),
     -- FKs
+    CONSTRAINT FK_facultad_profesor FOREIGN KEY (ci) REFERENCES profesor(ciProfesor)
 );
 
-CREATE TABLE profesor(
-    ciProfesor INTEGER NOT NULL,
-    codigoFacultad INTEGER NOT NULL,
 
-    CONSTRAINT PK_profesor PRIMARY KEY (ciProfesor),
-    -- FKs
-    CONSTRAINT FK_profesor_persona FOREIGN KEY (ciProfesor) REFERENCES personal(ciPersonal),
-    CONSTRAINT FK_profesor_facultad FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
-);
 
 CREATE TABLE administrativo(
-    ciAdmin INTEGER NOT NULL,
+    ciAdmin BIGINT NOT NULL,
 
     CONSTRAINT PK_administrativo PRIMARY KEY (ciAdmin),
     -- FKs
@@ -96,8 +100,8 @@ CREATE TABLE programa_academico(
     nombre VARCHAR(20) NOT NULL,
     modalidad modalidad NOT NULL,
     requisitos_ingreso VARCHAR(50) NOT NULL,
-    codigoFacultad INTEGER NOT NULL,
-    duracion INTEGER NOT NULL,
+    codigoFacultad BIGINT NOT NULL,
+    duracion BIGINT NOT NULL,
 
     CONSTRAINT PK_programa_academico PRIMARY KEY (IDPrograma),
     -- FKs
@@ -123,11 +127,11 @@ CREATE TABLE postgrado(
 -- TABLA SEDE UNIVERSITARIA
 CREATE TABLE sede_universitaria(
     IDSede SERIAL, 
-    nombre VARCHAR(10) NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
     ubicacion VARCHAR(20) NOT NULL,
-    cantidad_labs INTEGER NOT NULL,
-    cantidad_oficinas INTEGER NOT NULL,
-    cantidad_aulas INTEGER NOT NULL,
+    cantidad_labs BIGINT NOT NULL,
+    cantidad_oficinas BIGINT NOT NULL,
+    cantidad_aulas BIGINT NOT NULL,
     
     CONSTRAINT PK_sede_universitaria PRIMARY KEY (IDSede)
     -- FKs
@@ -145,7 +149,7 @@ CREATE TABLE recurso_academico(
 );
 
 CREATE TABLE software_educativo(
-    IDRec INTEGER NOT NULL,
+    IDRec BIGINT NOT NULL,
     licencia VARCHAR(20) NOT NULL,
     fecha_expiracion DATE NOT NULL,
 
@@ -154,11 +158,11 @@ CREATE TABLE software_educativo(
 );
 
 CREATE TABLE equipos_tecnologicos(
-    IDRec INTEGER NOT NULL,
+    IDRec BIGINT NOT NULL,
     tipo VARCHAR(20) NOT NULL,
     marca VARCHAR(20) NOT NULL,
     modelo VARCHAR(20) NOT NULL,
-    ciProfesor INTEGER NOT NULL,
+    ciProfesor BIGINT NOT NULL,
 
     CONSTRAINT PK_equipos_tecnologicos PRIMARY KEY (IDRec),
     -- FKs
@@ -167,18 +171,18 @@ CREATE TABLE equipos_tecnologicos(
 );
 
 CREATE TABLE libro(
-    IDRec INTEGER NOT NULL,
+    IDRec BIGINT NOT NULL,
     ISBN VARCHAR(20) NOT NULL,
     autor VARCHAR(30) NOT NULL,
     editorial VARCHAR(30) NOT NULL,
-    edicion VARCHAR(10) NOT NULL,
+    edicion VARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_libro PRIMARY KEY (IDRec),
     CONSTRAINT FK_libro_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
 CREATE TABLE material_lab(
-    IDRec INTEGER NOT NULL,
+    IDRec BIGINT NOT NULL,
     tipo VARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_material_lab PRIMARY KEY (IDRec),
@@ -189,7 +193,7 @@ CREATE TABLE material_lab(
 -- TABLA PROVEEDOR
 CREATE TABLE proveedor(
     IDProv SERIAL, 
-    nombre VARCHAR(10) NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
     ubicacion VARCHAR(20) NOT NULL,
     
     CONSTRAINT PK_proveedor PRIMARY KEY (IDProv)
@@ -198,8 +202,8 @@ CREATE TABLE proveedor(
 
 -- TABLA EMPRESA PATROCINADORA 
 CREATE TABLE empresa_patrocinadora(
-    RIF INTEGER,
-    nombre VARCHAR(10) NOT NULL,
+    RIF BIGINT,
+    nombre VARCHAR(20) NOT NULL,
     direccion VARCHAR(20) NOT NULL,
     contacto VARCHAR(15) NOT NULL,
     tipo_convenio VARCHAR(15) NOT NULL,
@@ -216,8 +220,8 @@ CREATE TABLE factura(
     estado estado_factura NOT NULL,
     metodo metodo_pago NOT NULL,
     monto_pagado NUMERIC(5,2) NOT NULL,
-    rif INTEGER,
-    ciEstudiante INTEGER NOT NULL,
+    rif BIGINT,
+    ciEstudiante BIGINT NOT NULL,
 
     CONSTRAINT PK_factura PRIMARY KEY (num_factura),
     -- FKs
@@ -238,9 +242,9 @@ CREATE TABLE cargo_admin(
 CREATE TABLE asignatura(
     codigoAsignatura SERIAL,
     nombre VARCHAR(20) NOT NULL,
-    nro_creditos INTEGER NOT NULL,
+    nro_creditos BIGINT NOT NULL,
     tipo tipo_asignatura NOT NULL,
-    fk_asignatura INTEGER,
+    fk_asignatura BIGINT,
 
     CONSTRAINT PK_asignatura PRIMARY KEY (codigoAsignatura),
     -- FKs
@@ -250,8 +254,8 @@ CREATE TABLE asignatura(
 -- TELEFONO
 CREATE TABLE telefono(
     IDTelefono SERIAL,
-    numero INTEGER NOT NULL,
-    ciPersona INTEGER NOT NULL,    
+    numero BIGINT NOT NULL,
+    ciPersona BIGINT NOT NULL,    
 
     CONSTRAINT PK_telefono PRIMARY KEY (IDTelefono),
     CONSTRAINT FK_telefono_persona FOREIGN KEY (ciPersona) REFERENCES persona(ci)
@@ -263,7 +267,7 @@ CREATE TABLE evaluacion(
     ponderacion NUMERIC(5,2) NOT NULL,
     tipo tipo_evaluacion NOT NULL,
     descripcion VARCHAR(50) NOT NULL,
-    codigoAsignatura INTEGER NOT NULL,
+    codigoAsignatura BIGINT NOT NULL,
 
     CONSTRAINT PK_evaluacion PRIMARY KEY (IDEvaluacion),
     CONSTRAINT FK_evaluacion_asignatura FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
@@ -271,8 +275,8 @@ CREATE TABLE evaluacion(
 
 -- PERIODO ACADEMICO 
 CREATE TABLE periodo_academico(
-    periodo VARCHAR(10) NOT NULL,
-    trimestre INTEGER NOT NULL,
+    periodo VARCHAR(20) NOT NULL,
+    trimestre BIGINT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
 
@@ -281,16 +285,16 @@ CREATE TABLE periodo_academico(
 
 -- HORARIO 
 CREATE TABLE horario(
-    dia_semana VARCHAR(10) NOT NULL,
-    hora_inicio VARCHAR(10) NOT NULL,
-    hora_fin VARCHAR(10) NOT NULL,
+    dia_semana VARCHAR(20) NOT NULL,
+    hora_inicio VARCHAR(20) NOT NULL,
+    hora_fin VARCHAR(20) NOT NULL,
 
     CONSTRAINT PK_horario PRIMARY KEY (dia_semana, hora_inicio, hora_fin)
 );
 
 -- AULA
 CREATE TABLE aula(
-    numero INTEGER NOT NULL,
+    numero BIGINT NOT NULL,
     tipo tipo_aula NOT NULL,
 
     CONSTRAINT PK_aula PRIMARY KEY (numero)
@@ -298,18 +302,18 @@ CREATE TABLE aula(
 
 -- SECCION 
 CREATE TABLE seccion (
-    numero INTEGER NOT NULL,
-    codigoAsignatura INTEGER NOT NULL,
+    numero BIGINT NOT NULL,
+    codigoAsignatura BIGINT NOT NULL,
     -- PROG ACADEMICO?
-    periodo VARCHAR(10) NOT NULL,
-    trimestre INTEGER NOT NULL,
+    periodo VARCHAR(20) NOT NULL,
+    trimestre BIGINT NOT NULL,
     -- 
-    capacidad INTEGER NOT NULL,
-    ciProfesor INTEGER NOT NULL,
-    hora_inicio VARCHAR(10) NOT NULL,
-    hora_fin VARCHAR(10) NOT NULL,
-    dia_semana VARCHAR(10) NOT NULL,
-    numero_aula INTEGER NOT NULL,
+    capacidad BIGINT NOT NULL,
+    ciProfesor BIGINT NOT NULL,
+    hora_inicio VARCHAR(20) NOT NULL,
+    hora_fin VARCHAR(20) NOT NULL,
+    dia_semana VARCHAR(20) NOT NULL,
+    numero_aula BIGINT NOT NULL,
 
     CONSTRAINT PK_seccion PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre),
     -- FKs
@@ -325,11 +329,11 @@ CREATE TABLE seccion (
 -- N/M
 -- COMPRA
 CREATE TABLE compra(
-    IDSede INTEGER NOT NULL,
-    IDRec INTEGER NOT NULL,
-    IDProv INTEGER NOT NULL,
+    IDSede BIGINT NOT NULL,
+    IDRec BIGINT NOT NULL,
+    IDProv BIGINT NOT NULL,
     fecha_adq DATE NOT NULL,
-    cantidad INTEGER NOT NULL,
+    cantidad BIGINT NOT NULL,
 
     CONSTRAINT PK_compra PRIMARY KEY (IDSede, IDRec, IDProv),
     -- FKs
@@ -339,9 +343,9 @@ CREATE TABLE compra(
 );
     
 CREATE TABLE inventario(
-    IDRec INTEGER NOT NULL,
-    IDSede INTEGER NOT NULL,
-    cantidad_disponible INTEGER NOT NULL,
+    IDRec BIGINT NOT NULL,
+    IDSede BIGINT NOT NULL,
+    cantidad_disponible BIGINT NOT NULL,
 
     CONSTRAINT PK_inventario PRIMARY KEY (IDRec, IDSede),
     -- FKs
@@ -351,8 +355,8 @@ CREATE TABLE inventario(
 
 -- SEDE TIENE FACULTAD
 CREATE TABLE sede_tiene_facultad(
-    IDSede INTEGER NOT NULL,
-    codigoFacultad INTEGER NOT NULL,
+    IDSede BIGINT NOT NULL,
+    codigoFacultad BIGINT NOT NULL,
 
     CONSTRAINT PK_sede_tiene_facultad PRIMARY KEY (IDSede, codigoFacultad),
     -- FKs
@@ -362,10 +366,10 @@ CREATE TABLE sede_tiene_facultad(
 
 -- CONTRATO
 CREATE TABLE contrato(
-    IDSede INTEGER NOT NULL,
-    IDcargo INTEGER NOT NULL,
-    ciProfesor INTEGER NOT NULL,
-    codigoFacultad INTEGER NOT NULL,
+    IDSede BIGINT NOT NULL,
+    IDcargo BIGINT NOT NULL,
+    ciProfesor BIGINT NOT NULL,
+    codigoFacultad BIGINT NOT NULL,
     salario NUMERIC(10,2) NOT NULL,
     tipo_contrato tipo_contrato NOT NULL,
 
@@ -379,8 +383,8 @@ CREATE TABLE contrato(
 
 -- EMITE
 CREATE TABLE emite(
-    ci INTEGER NOT NULL,
-    num_factura INTEGER NOT NULL,
+    ci BIGINT NOT NULL,
+    num_factura BIGINT NOT NULL,
 
     CONSTRAINT PK_emite PRIMARY KEY (ci, num_factura),
     -- FKs
@@ -390,8 +394,8 @@ CREATE TABLE emite(
 
 -- PLAN DE ESTUDIO 
 CREATE TABLE plan_estudio(
-    IDPrograma INTEGER NOT NULL,
-    codigoAsignatura INTEGER NOT NULL,
+    IDPrograma BIGINT NOT NULL,
+    codigoAsignatura BIGINT NOT NULL,
     es_obligatorio BOOLEAN NOT NULL,
 
     CONSTRAINT PK_plan_estudio PRIMARY KEY (IDPrograma, codigoAsignatura),
@@ -402,8 +406,8 @@ CREATE TABLE plan_estudio(
 
 -- PRESENTA
 CREATE TABLE presenta(
-    IDEvaluacion INTEGER NOT NULL,
-    CI INTEGER NOT NULL,
+    IDEvaluacion BIGINT NOT NULL,
+    CI BIGINT NOT NULL,
     calificacion NUMERIC(5,2) NOT NULL,
 
     CONSTRAINT PK_presenta PRIMARY KEY (IDEvaluacion, CI),
@@ -415,8 +419,8 @@ CREATE TABLE presenta(
 -- CURSA
 CREATE TABLE cursa(
     fecha_inicio DATE NOT NULL,
-    IDPrograma INTEGER NOT NULL,
-    ci INTEGER NOT NULL,
+    IDPrograma BIGINT NOT NULL,
+    ci BIGINT NOT NULL,
     promedio NUMERIC(5,2) NOT NULL,  
 
     CONSTRAINT PK_cursa PRIMARY KEY (fecha_inicio, IDPrograma, ci),
@@ -427,14 +431,14 @@ CREATE TABLE cursa(
 
 -- INSCRIBE 
 CREATE TABLE inscribe(
-    numero INTEGER NOT NULL,
-    codigoAsignatura INTEGER NOT NULL,
-    periodo VARCHAR(10) NOT NULL,
-    trimestre INTEGER NOT NULL,
-    ci INTEGER NOT NULL,
+    numero BIGINT NOT NULL,
+    codigoAsignatura BIGINT NOT NULL,
+    periodo VARCHAR(20) NOT NULL,
+    trimestre BIGINT NOT NULL,
+    ci BIGINT NOT NULL,
     fecha DATE NOT NULL,
     estado_ins estado_inscripcion NOT NULL,
-    calificacion_final INTEGER NOT NULL,
+    calificacion_final BIGINT NOT NULL,
 
     CONSTRAINT PK_inscribe PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre, ci, fecha),
     -- FKs
