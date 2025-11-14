@@ -194,7 +194,11 @@ INSERT INTO empresa_patrocinadora (RIF, nombre, direccion, contacto, tipo_conven
 
 INSERT INTO factura (fecha, monto, estado, metodo, monto_pagado, rif, ciEstudiante) VALUES
 ('2024-01-20', 500.00, 'pendiente', 'transferencia', 0, 123456789, 25500123),
-('2024-01-25', 750.00, 'pendiente', 'efectivo', 750.00, 987654321, 26789234);
+('2024-01-25', 750.00, 'pendiente', 'mixto', 750.00, 987654321, 26789234);
+
+INSERT INTO factura (fecha, monto, estado, metodo, monto_pagado, rif, ciEstudiante) VALUES
+('2024-11-01', 900.00, 'pendiente', 'mixto', 400.00, 123456789, 25500123);
+
 
 INSERT INTO emite (ci, num_factura) VALUES
 (18567012, 1), (19478123, 2);
