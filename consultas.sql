@@ -13,7 +13,8 @@ LEFT JOIN postgrado po ON pa.IDPrograma = po.IDPrograma
 GROUP BY s.nombre, f.nombre
 ORDER BY s.nombre, f.nombre;
 
---Consulta B
+
+-- CONSULTA B ORIGINAL (ahora sí funcionará)
 SELECT DISTINCT p.ci, p.nombre, p.apellido, e.estado_ac
 FROM inscribe i
 JOIN estudiante e ON i.ci = e.ciEstudiante
