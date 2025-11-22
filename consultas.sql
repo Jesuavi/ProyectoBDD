@@ -13,8 +13,7 @@ LEFT JOIN postgrado po ON pa.IDPrograma = po.IDPrograma
 GROUP BY s.nombre, f.nombre
 ORDER BY s.nombre, f.nombre;
 
-
--- CONSULTA B ORIGINAL (ahora sí funcionará)
+-- CONSULTA B  
 SELECT DISTINCT p.ci, p.nombre, p.apellido, e.estado_ac
 FROM inscribe i
 JOIN estudiante e ON i.ci = e.ciEstudiante
@@ -77,7 +76,6 @@ GROUP BY a.codigoAsignatura, a.nombre
 HAVING COUNT(DISTINCT pe.IDPrograma) > 1
 ORDER BY programas_inscritos DESC, profesores_distintos DESC;
 
-
 --Consulta G
 SELECT p.ci, p.nombre, p.apellido, c.promedio
 FROM estudiante e
@@ -85,7 +83,6 @@ JOIN persona p ON e.ciEstudiante = p.ci
 JOIN cursa c ON e.ciEstudiante = c.ci
 WHERE e.estado_ac = 'egresado'
   AND c.promedio >= 17.5;
-
 
 -- CONSULTA F 
 SELECT 
