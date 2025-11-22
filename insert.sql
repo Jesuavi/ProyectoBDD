@@ -92,6 +92,7 @@ INSERT INTO asignatura (nombre, nro_creditos, tipo, fk_asignatura) VALUES
 
 INSERT INTO plan_estudio (IDPrograma, codigoAsignatura, es_obligatorio) VALUES
 (1, 1, true), (1, 2, true), (1, 3, true),
+(2, 2, true), (2, 5, true), (5, 9, true),
 (1, 4, true), (1, 5, true), (1, 6, true),
 (1, 7, true), (1, 8, true), (1, 9, true);
 
@@ -107,6 +108,10 @@ INSERT INTO cargo_admin (nombre) VALUES
 INSERT INTO contrato (IDSede, IDcargo, ciProfesor, codigoFacultad, salario, tipo_contrato) VALUES
 (1, 1, 15456789, 1, 2500.00, 'tiempo completo'),
 (1, 2, 16345890, 1, 2000.00, 'tiempo completo'),
+(1, 4, 15456789, 1, 2800.00, 'tiempo completo'),
+(1, 3, 16345890, 2, 2200.00, 'medio tiempo'),
+(2, 2, 17234901, 3, 2300.00, 'tiempo completo'),
+(3, 4, 17234901, 3, 1500.00, 'por horas'),
 (1, 3, 17234901, 2, 1800.00, 'medio tiempo');
 
 -- =============================================
@@ -134,6 +139,8 @@ INSERT INTO aula (numero, tipo) VALUES
 INSERT INTO seccion (numero, codigoAsignatura, periodo, trimestre, capacidad, ciProfesor, hora_inicio, hora_fin, dia_semana, numero_aula) VALUES
 (1, 1, '2024-1', 1, 30, 15456789, '08:00', '10:00', 'Lunes', 101),
 (1, 2, '2024-1', 1, 35, 16345890, '10:30', '12:30', 'Lunes', 102),
+(2, 2, '2024-1', 1, 30, 16345890, '10:30', '12:30', 'Lunes', 102),
+(1, 9, '2024-2', 2, 25, 17234901, '08:00', '10:00', 'Martes', 201),
 (2, 1, '2024-1', 1, 25, 15456789, '14:00', '16:00', 'Miércoles', 201);
 
 -- =============================================

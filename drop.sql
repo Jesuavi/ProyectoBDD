@@ -1,4 +1,3 @@
-
     -- DROP DOMAINS
     DROP DOMAIN IF EXISTS tipo_postgrado CASCADE;
     DROP DOMAIN IF EXISTS modalidad CASCADE;

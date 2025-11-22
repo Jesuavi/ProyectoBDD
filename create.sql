@@ -32,45 +32,38 @@ CREATE DOMAIN tipo_aula AS VARCHAR(20)
 CREATE DOMAIN sexo AS VARCHAR(20)
     CHECK (VALUE IN ('masculino','femenino','N/A'));
 
--- PERSONA
+-- =============================================
+-- 1. PERSONAS, ESTUDIANTES, PERSONAL, PROFESORES
+-- =============================================
 CREATE TABLE persona(
-    ci BIGINT NOT NULL,
-    nombre VARCHAR(20) NOT NULL,
-    apellido VARCHAR(20) NOT NULL,
+    ci BIGINT PRIMARY KEY,
+    nombre VARCHAR(40) NOT NULL,
+    apellido VARCHAR(40) NOT NULL,
     fecha_nac DATE NOT NULL,
-    direccion VARCHAR(50) NOT NULL,
-    correo VARCHAR(20) NOT NULL, 
-
-    CONSTRAINT PK_persona PRIMARY KEY (ci)
+    direccion VARCHAR(100),
+    correo VARCHAR(80) NOT NULL
 );
 
 CREATE TABLE estudiante(
-    ciEstudiante BIGINT NOT NULL,
-    nro_carnet BIGINT NOT NULL,
-    sexo sexo NOT NULL,
-    estado_ac estado_academico NOT NULL,
+    ciEstudiante BIGINT PRIMARY KEY,
+    nro_carnet BIGINT NOT NULL UNIQUE,
+    sexo VARCHAR(20) NOT NULL,       -- dominio original
+    estado_ac VARCHAR(15) NOT NULL,  -- dominio original
     ciRep BIGINT,
     parentesco VARCHAR(20),
-
-    CONSTRAINT PK_estudiante PRIMARY KEY (ciEstudiante),
-    CONSTRAINT FK_estudiante_persona FOREIGN KEY (ciEstudiante) REFERENCES persona(ci),
-    CONSTRAINT FK_estudiante_representante FOREIGN KEY (ciRep) REFERENCES persona(ci)
+    FOREIGN KEY (ciEstudiante) REFERENCES persona(ci),
+    FOREIGN KEY (ciRep) REFERENCES persona(ci)
 );
 
 CREATE TABLE personal(
-    ciPersonal BIGINT NOT NULL,
+    ciPersonal BIGINT PRIMARY KEY,
     fecha_EmpTrabajar DATE NOT NULL,
-
-    CONSTRAINT PK_personal PRIMARY KEY (ciPersonal),
-    CONSTRAINT FK_personal_persona FOREIGN KEY (ciPersonal) REFERENCES persona(ci)
+    FOREIGN KEY (ciPersonal) REFERENCES persona(ci)
 );
 
 CREATE TABLE profesor(
-    ciProfesor BIGINT NOT NULL,
-
-    CONSTRAINT PK_profesor PRIMARY KEY (ciProfesor),
-    -- FKs
-    CONSTRAINT FK_profesor_persona FOREIGN KEY (ciProfesor) REFERENCES personal(ciPersonal)
+    ciProfesor BIGINT PRIMARY KEY,
+    FOREIGN KEY (ciProfesor) REFERENCES personal(ciPersonal)
 );
 
 -- TABLA FACULTAD
@@ -84,364 +77,292 @@ CREATE TABLE facultad(
     CONSTRAINT FK_facultad_profesor FOREIGN KEY (ci) REFERENCES profesor(ciProfesor)
 );
 
-
-
 CREATE TABLE administrativo(
-    ciAdmin BIGINT NOT NULL,
-
-    CONSTRAINT PK_administrativo PRIMARY KEY (ciAdmin),
-    -- FKs
-    CONSTRAINT FK_admin_persona FOREIGN KEY (ciAdmin) REFERENCES personal(ciPersonal)
+    ciAdmin BIGINT PRIMARY KEY,
+    FOREIGN KEY (ciAdmin) REFERENCES personal(ciPersonal)
 );
 
--- PROGRAMA ACADEMICO
+-- =============================================
+-- 2. PROGRAMAS ACADÉMICOS
+-- =============================================
 CREATE TABLE programa_academico(
-    IDPrograma SERIAL,
-    nombre VARCHAR(20) NOT NULL,
-    modalidad modalidad NOT NULL,
-    requisitos_ingreso VARCHAR(50) NOT NULL,
-    codigoFacultad BIGINT NOT NULL,
-    duracion BIGINT NOT NULL,
-
-    CONSTRAINT PK_programa_academico PRIMARY KEY (IDPrograma),
-    -- FKs
-    CONSTRAINT FK_prog_acad_facultad FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
+    IDPrograma SERIAL PRIMARY KEY,
+    nombre VARCHAR(60) NOT NULL,
+    modalidad VARCHAR(20) NOT NULL, -- dominio original
+    requisitos_ingreso VARCHAR(200),
+    codigoFacultad INT NOT NULL,
+    duracion INT NOT NULL,
+    FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
 );
--- PREGRADO POSTGRADO
+
 CREATE TABLE pregrado(
-    IDPrograma INT NOT NULL,
-    
-    CONSTRAINT PK_pregrado PRIMARY KEY (IDPrograma),
-    CONSTRAINT FK_pregrado_prog_academico FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma)
+    IDPrograma INT PRIMARY KEY,
+    FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma)
 );
 
 CREATE TABLE postgrado(
-    IDPrograma INT NOT NULL,
-    tipo tipo_postgrado NOT NULL,
-
-    CONSTRAINT PK_postgrado PRIMARY KEY (IDPrograma),
-    CONSTRAINT FK_postgrado_prog_academico FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma)
+    IDPrograma INT PRIMARY KEY,
+    tipo VARCHAR(20) NOT NULL, -- dominio original
+    FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma)
 );
 
-
--- TABLA SEDE UNIVERSITARIA
+-- =============================================
+-- 3. SEDE UNIVERSITARIA
+-- =============================================
 CREATE TABLE sede_universitaria(
-    IDSede SERIAL, 
-    nombre VARCHAR(20) NOT NULL,
-    ubicacion VARCHAR(20) NOT NULL,
-    cantidad_labs BIGINT NOT NULL,
-    cantidad_oficinas BIGINT NOT NULL,
-    cantidad_aulas BIGINT NOT NULL,
-    
-    CONSTRAINT PK_sede_universitaria PRIMARY KEY (IDSede)
-    -- FKs
+    IDSede SERIAL PRIMARY KEY,
+    nombre VARCHAR(60) NOT NULL,
+    ubicacion VARCHAR(60) NOT NULL,
+    cantidad_labs INT NOT NULL,
+    cantidad_oficinas INT NOT NULL,
+    cantidad_aulas INT NOT NULL
 );
 
+CREATE TABLE sede_tiene_facultad(
+    IDSede INT,
+    codigoFacultad INT,
+    PRIMARY KEY (IDSede, codigoFacultad),
+    FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
+    FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
+);
 
-
--- RECURSOS ACADEMICOS
+-- =============================================
+-- 4. RECURSOS ACADÉMICOS
+-- =============================================
 CREATE TABLE recurso_academico(
-    IDRec SERIAL,
-    nombre VARCHAR(20) NOT NULL,   
-    descripcion VARCHAR(50) NOT NULL,
-
-    CONSTRAINT PK_recurso_academico PRIMARY KEY (IDRec)
+    IDRec SERIAL PRIMARY KEY,
+    nombre VARCHAR(60) NOT NULL,
+    descripcion VARCHAR(200)
 );
 
 CREATE TABLE software_educativo(
-    IDRec BIGINT NOT NULL,
-    licencia VARCHAR(20) NOT NULL,
+    IDRec INT PRIMARY KEY,
+    licencia VARCHAR(40),
     fecha_expiracion DATE NOT NULL,
-
-    CONSTRAINT PK_software_educativo PRIMARY KEY (IDRec),
-    CONSTRAINT FK_soft_edu_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
 CREATE TABLE equipos_tecnologicos(
-    IDRec BIGINT NOT NULL,
-    tipo VARCHAR(20) NOT NULL,
-    marca VARCHAR(20) NOT NULL,
-    modelo VARCHAR(20) NOT NULL,
+    IDRec INT PRIMARY KEY,
+    tipo VARCHAR(30),
+    marca VARCHAR(30),
+    modelo VARCHAR(30),
     ciProfesor BIGINT NOT NULL,
-
-    CONSTRAINT PK_equipos_tecnologicos PRIMARY KEY (IDRec),
-    -- FKs
-    CONSTRAINT FK_equipos_tec_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec),
-    CONSTRAINT FK_equipos_tec_profesor FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor)
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec),
+    FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor)
 );
 
 CREATE TABLE libro(
-    IDRec BIGINT NOT NULL,
-    ISBN VARCHAR(20) NOT NULL,
-    autor VARCHAR(30) NOT NULL,
-    editorial VARCHAR(30) NOT NULL,
-    edicion VARCHAR(20) NOT NULL,
-
-    CONSTRAINT PK_libro PRIMARY KEY (IDRec),
-    CONSTRAINT FK_libro_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
+    IDRec INT PRIMARY KEY,
+    ISBN VARCHAR(20),
+    autor VARCHAR(60),
+    editorial VARCHAR(60),
+    edicion VARCHAR(20),
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
 CREATE TABLE material_lab(
-    IDRec BIGINT NOT NULL,
-    tipo VARCHAR(20) NOT NULL,
-
-    CONSTRAINT PK_material_lab PRIMARY KEY (IDRec),
-    CONSTRAINT FK_mat_lab_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
+    IDRec INT PRIMARY KEY,
+    tipo VARCHAR(30),
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
-
--- TABLA PROVEEDOR
+-- =============================================
+-- 5. PROVEEDOR, EMPRESA Y FACTURA
+-- =============================================
 CREATE TABLE proveedor(
-    IDProv SERIAL, 
-    nombre VARCHAR(20) NOT NULL,
-    ubicacion VARCHAR(20) NOT NULL,
-    
-    CONSTRAINT PK_proveedor PRIMARY KEY (IDProv)
-    -- FKs
-); 
-
--- TABLA EMPRESA PATROCINADORA 
-CREATE TABLE empresa_patrocinadora(
-    RIF BIGINT,
-    nombre VARCHAR(20) NOT NULL,
-    direccion VARCHAR(20) NOT NULL,
-    contacto VARCHAR(15) NOT NULL,
-    tipo_convenio VARCHAR(15) NOT NULL,
-
-    CONSTRAINT PK_empresa_patrocinadora PRIMARY KEY (RIF)
-    -- FKse
+    IDProv SERIAL PRIMARY KEY,
+    nombre VARCHAR(60),
+    ubicacion VARCHAR(60)
 );
 
--- FACTURA
+CREATE TABLE empresa_patrocinadora(
+    RIF BIGINT PRIMARY KEY,
+    nombre VARCHAR(60),
+    direccion VARCHAR(100),
+    contacto VARCHAR(20),
+    tipo_convenio VARCHAR(30)
+);
+
 CREATE TABLE factura(
-    num_factura SERIAL,
+    num_factura SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
-    monto NUMERIC(5,2) NOT NULL,
-    estado estado_factura NOT NULL,
-    metodo metodo_pago NOT NULL,
-    monto_pagado NUMERIC(5,2) NOT NULL,
+    monto NUMERIC(10,2) NOT NULL,
+    estado VARCHAR(20), -- dominio original
+    metodo VARCHAR(20), -- dominio original
+    monto_pagado NUMERIC(10,2) DEFAULT 0,
     rif BIGINT,
     ciEstudiante BIGINT NOT NULL,
-
-    CONSTRAINT PK_factura PRIMARY KEY (num_factura),
-    -- FKs
-    CONSTRAINT FK_factura_empresa_patrocinadora FOREIGN KEY (rif) REFERENCES empresa_patrocinadora(RIF),
-    CONSTRAINT FK_factura_estudiante FOREIGN KEY (ciEstudiante) REFERENCES estudiante(ciEstudiante)
+    FOREIGN KEY (rif) REFERENCES empresa_patrocinadora(RIF),
+    FOREIGN KEY (ciEstudiante) REFERENCES estudiante(ciEstudiante)
 );
 
--- CARGO ADMINISTRATIVO
-CREATE TABLE cargo_admin(
-    IDcargo SERIAL,
-    nombre VARCHAR(20) NOT NULL,
-
-    CONSTRAINT PK_cargo_administrativo PRIMARY KEY (IDcargo)
-    -- FKs
-);
-
--- TABLA ASIGNATURA
-CREATE TABLE asignatura(
-    codigoAsignatura SERIAL,
-    nombre VARCHAR(20) NOT NULL,
-    nro_creditos BIGINT NOT NULL,
-    tipo tipo_asignatura NOT NULL,
-    fk_asignatura BIGINT,
-
-    CONSTRAINT PK_asignatura PRIMARY KEY (codigoAsignatura),
-    -- FKs
-    CONSTRAINT FK_asignatura_asignatura FOREIGN KEY (fk_asignatura) REFERENCES asignatura(codigoAsignatura)
-);
- 
--- TELEFONO
-CREATE TABLE telefono(
-    IDTelefono SERIAL,
-    numero BIGINT NOT NULL,
-    ciPersona BIGINT NOT NULL,    
-
-    CONSTRAINT PK_telefono PRIMARY KEY (IDTelefono),
-    CONSTRAINT FK_telefono_persona FOREIGN KEY (ciPersona) REFERENCES persona(ci)
-);
-
--- EVALUACION  
-CREATE TABLE evaluacion(
-    IDEvaluacion SERIAL,
-    ponderacion NUMERIC(5,2) NOT NULL,
-    tipo tipo_evaluacion NOT NULL,
-    descripcion VARCHAR(50) NOT NULL,
-    codigoAsignatura BIGINT NOT NULL,
-
-    CONSTRAINT PK_evaluacion PRIMARY KEY (IDEvaluacion),
-    CONSTRAINT FK_evaluacion_asignatura FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
-);
-
--- PERIODO ACADEMICO 
-CREATE TABLE periodo_academico(
-    periodo VARCHAR(20) NOT NULL,
-    trimestre BIGINT NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
-
-    CONSTRAINT PK_periodo_academico PRIMARY KEY (periodo, trimestre)
-);
-
--- HORARIO 
-CREATE TABLE horario(
-    dia_semana VARCHAR(20) NOT NULL,
-    hora_inicio VARCHAR(20) NOT NULL,
-    hora_fin VARCHAR(20) NOT NULL,
-
-    CONSTRAINT PK_horario PRIMARY KEY (dia_semana, hora_inicio, hora_fin)
-);
-
--- AULA
-CREATE TABLE aula(
-    numero BIGINT NOT NULL,
-    tipo tipo_aula NOT NULL,
-
-    CONSTRAINT PK_aula PRIMARY KEY (numero)
-);
-
--- SECCION 
-CREATE TABLE seccion (
-    numero BIGINT NOT NULL,
-    codigoAsignatura BIGINT NOT NULL,
-    -- PROG ACADEMICO?
-    periodo VARCHAR(20) NOT NULL,
-    trimestre BIGINT NOT NULL,
-    -- 
-    capacidad BIGINT NOT NULL,
-    ciProfesor BIGINT NOT NULL,
-    hora_inicio VARCHAR(20) NOT NULL,
-    hora_fin VARCHAR(20) NOT NULL,
-    dia_semana VARCHAR(20) NOT NULL,
-    numero_aula BIGINT NOT NULL,
-
-    CONSTRAINT PK_seccion PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre),
-    -- FKs
-    CONSTRAINT FK_seccion_asignatura FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura),
-    -- PROG ACADEMICO?
-    CONSTRAINT FK_seccion_prog_academico FOREIGN KEY (periodo, trimestre) REFERENCES periodo_academico(periodo, trimestre),
-    -- 
-    CONSTRAINT FK_seccion_profesor FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor),
-    CONSTRAINT FK_seccion_horario FOREIGN KEY (dia_semana, hora_inicio, hora_fin) REFERENCES horario(dia_semana, hora_inicio, hora_fin),
-    CONSTRAINT FK_seccion_aula FOREIGN KEY (numero_aula) REFERENCES aula(numero)
-);
-
--- N/M
--- COMPRA
-CREATE TABLE compra(
-    IDSede BIGINT NOT NULL,
-    IDRec BIGINT NOT NULL,
-    IDProv BIGINT NOT NULL,
-    fecha_adq DATE NOT NULL,
-    cantidad BIGINT NOT NULL,
-
-    CONSTRAINT PK_compra PRIMARY KEY (IDSede, IDRec, IDProv),
-    -- FKs
-    CONSTRAINT FK_compra_sede_universitaria FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
-    CONSTRAINT FK_compra_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec),
-    CONSTRAINT FK_compra_proveedor FOREIGN KEY (IDProv) REFERENCES proveedor(IDProv)
-);
-    
-CREATE TABLE inventario(
-    IDRec BIGINT NOT NULL,
-    IDSede BIGINT NOT NULL,
-    cantidad_disponible BIGINT NOT NULL,
-
-    CONSTRAINT PK_inventario PRIMARY KEY (IDRec, IDSede),
-    -- FKs
-    CONSTRAINT FK_inventario_recurso_academico FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec),
-    CONSTRAINT FK_inventario_sede_universitaria FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede)
-);
-
--- SEDE TIENE FACULTAD
-CREATE TABLE sede_tiene_facultad(
-    IDSede BIGINT NOT NULL,
-    codigoFacultad BIGINT NOT NULL,
-
-    CONSTRAINT PK_sede_tiene_facultad PRIMARY KEY (IDSede, codigoFacultad),
-    -- FKs
-    CONSTRAINT FK_sede_tiene_facultad_sede_universitaria FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
-    CONSTRAINT FK_sede_tiene_facultad_facultad FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
-);
-
--- CONTRATO
-CREATE TABLE contrato(
-    IDSede BIGINT NOT NULL,
-    IDcargo BIGINT NOT NULL,
-    ciProfesor BIGINT NOT NULL,
-    codigoFacultad BIGINT NOT NULL,
-    salario NUMERIC(10,2) NOT NULL,
-    tipo_contrato tipo_contrato NOT NULL,
-
-    CONSTRAINT PK_contrato PRIMARY KEY (IDSede, IDcargo, ciProfesor, codigoFacultad),
-    -- FKs
-    CONSTRAINT FK_contrato_sede_universitaria FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
-    CONSTRAINT FK_contrato_cargo_admin FOREIGN KEY (IDcargo) REFERENCES cargo_admin(IDcargo),
-    CONSTRAINT FK_contrato_profesor FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor),
-    CONSTRAINT FK_contrato_facultad FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
-);
-
--- EMITE
 CREATE TABLE emite(
-    ci BIGINT NOT NULL,
-    num_factura BIGINT NOT NULL,
-
-    CONSTRAINT PK_emite PRIMARY KEY (ci, num_factura),
-    -- FKs
-    CONSTRAINT FK_emite_administrativo FOREIGN KEY (ci) REFERENCES administrativo(ciAdmin),
-    CONSTRAINT FK_emite_factura FOREIGN KEY (num_factura) REFERENCES factura(num_factura)
+    ci BIGINT,
+    num_factura INT,
+    PRIMARY KEY (ci, num_factura),
+    FOREIGN KEY (ci) REFERENCES administrativo(ciAdmin),
+    FOREIGN KEY (num_factura) REFERENCES factura(num_factura)
 );
 
--- PLAN DE ESTUDIO 
+-- =============================================
+-- 6. CARGOS, CONTRATOS Y ASIGNATURAS
+-- =============================================
+CREATE TABLE cargo_admin(
+    IDcargo SERIAL PRIMARY KEY,
+    nombre VARCHAR(40)
+);
+
+CREATE TABLE contrato(
+    IDSede INT,
+    IDcargo INT,
+    ciProfesor BIGINT,
+    codigoFacultad INT,
+    salario NUMERIC(10,2),
+    tipo_contrato VARCHAR(20),
+    PRIMARY KEY (IDSede, IDcargo, ciProfesor),
+    FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
+    FOREIGN KEY (IDcargo) REFERENCES cargo_admin(IDcargo),
+    FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor),
+    FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
+);
+
+CREATE TABLE asignatura(
+    codigoAsignatura SERIAL PRIMARY KEY,
+    nombre VARCHAR(60),
+    nro_creditos INT NOT NULL,
+    tipo VARCHAR(15), -- dominio original
+    fk_asignatura INT,
+    FOREIGN KEY (fk_asignatura) REFERENCES asignatura(codigoAsignatura)
+);
+
 CREATE TABLE plan_estudio(
-    IDPrograma BIGINT NOT NULL,
-    codigoAsignatura BIGINT NOT NULL,
-    es_obligatorio BOOLEAN NOT NULL,
-
-    CONSTRAINT PK_plan_estudio PRIMARY KEY (IDPrograma, codigoAsignatura),
-    -- FKs
-    CONSTRAINT FK_plan_estudio_prog_academico FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma),
-    CONSTRAINT FK_plan_estudio_asignatura FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
+    IDPrograma INT,
+    codigoAsignatura INT,
+    es_obligatorio BOOLEAN,
+    PRIMARY KEY (IDPrograma, codigoAsignatura),
+    FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma),
+    FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
 );
 
--- PRESENTA
-CREATE TABLE presenta(
-    IDEvaluacion BIGINT NOT NULL,
-    CI BIGINT NOT NULL,
-    calificacion NUMERIC(5,2) NOT NULL,
-
-    CONSTRAINT PK_presenta PRIMARY KEY (IDEvaluacion, CI),
-    -- FKs
-    CONSTRAINT FK_presenta_evaluacion FOREIGN KEY (IDEvaluacion) REFERENCES evaluacion(IDEvaluacion),
-    CONSTRAINT FK_presenta_estudiante FOREIGN KEY (CI) REFERENCES estudiante(ciEstudiante)
+-- =============================================
+-- 7. PERÍODOS, HORARIO, AULA, SECCIÓN
+-- =============================================
+CREATE TABLE periodo_academico(
+    periodo VARCHAR(20),
+    trimestre INT,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    PRIMARY KEY (periodo, trimestre)
 );
 
--- CURSA
+CREATE TABLE horario(
+    dia_semana VARCHAR(20),
+    hora_inicio TIME,
+    hora_fin TIME,
+    PRIMARY KEY (dia_semana, hora_inicio, hora_fin)
+);
+
+CREATE TABLE aula(
+    numero INT PRIMARY KEY,
+    tipo VARCHAR(20) -- dominio original
+);
+
+CREATE TABLE seccion(
+    numero INT,
+    codigoAsignatura INT,
+    periodo VARCHAR(20),
+    trimestre INT,
+    capacidad INT,
+    ciProfesor BIGINT,
+    hora_inicio TIME,
+    hora_fin TIME,
+    dia_semana VARCHAR(20),
+    numero_aula INT,
+    PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre),
+    FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura),
+    FOREIGN KEY (periodo, trimestre) REFERENCES periodo_academico(periodo, trimestre),
+    FOREIGN KEY (ciProfesor) REFERENCES profesor(ciProfesor),
+    FOREIGN KEY (dia_semana, hora_inicio, hora_fin) REFERENCES horario(dia_semana, hora_inicio, hora_fin),
+    FOREIGN KEY (numero_aula) REFERENCES aula(numero)
+);
+
+-- =============================================
+-- 8. INSCRIPCIONES, CURSA Y EVALUACIONES
+-- =============================================
 CREATE TABLE cursa(
-    fecha_inicio DATE NOT NULL,
-    IDPrograma BIGINT NOT NULL,
-    ci BIGINT NOT NULL,
-    promedio NUMERIC(5,2) NOT NULL,  
-
-    CONSTRAINT PK_cursa PRIMARY KEY (fecha_inicio, IDPrograma, ci),
-    -- FKs
-    CONSTRAINT FK_cursa_prog_academico FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma),
-    CONSTRAINT FK_cursa_estudiante FOREIGN KEY (ci) REFERENCES estudiante(ciEstudiante)
+    fecha_inicio DATE,
+    IDPrograma INT,
+    ci BIGINT,
+    promedio NUMERIC(5,2),
+    PRIMARY KEY (IDPrograma, ci),
+    FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma),
+    FOREIGN KEY (ci) REFERENCES estudiante(ciEstudiante)
 );
 
--- INSCRIBE 
 CREATE TABLE inscribe(
-    numero BIGINT NOT NULL,
-    codigoAsignatura BIGINT NOT NULL,
-    periodo VARCHAR(20) NOT NULL,
-    trimestre BIGINT NOT NULL,
-    ci BIGINT NOT NULL,
-    fecha DATE NOT NULL,
-    estado_ins estado_inscripcion NOT NULL,
-    calificacion_final BIGINT NOT NULL,
+    numero INT,
+    codigoAsignatura INT,
+    periodo VARCHAR(20),
+    trimestre INT,
+    ci BIGINT,
+    fecha DATE,
+    estado_ins VARCHAR(20), -- dominio original
+    calificacion_final NUMERIC(5,2),
+    PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre, ci),
+    FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura),
+    FOREIGN KEY (periodo, trimestre) REFERENCES periodo_academico(periodo, trimestre),
+    FOREIGN KEY (ci) REFERENCES estudiante(ciEstudiante)
+);
 
-    CONSTRAINT PK_inscribe PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre, ci, fecha),
-    -- FKs
-    CONSTRAINT FK_inscribe_seccion FOREIGN KEY (numero, codigoAsignatura, periodo, trimestre) REFERENCES seccion(numero, codigoAsignatura, periodo, trimestre),
-    CONSTRAINT FK_inscribe_estudiante FOREIGN KEY (ci) REFERENCES estudiante(ciEstudiante)
+CREATE TABLE evaluacion(
+    IDEvaluacion SERIAL PRIMARY KEY,
+    ponderacion NUMERIC(5,2),
+    tipo VARCHAR(20), -- dominio original
+    descripcion VARCHAR(200),
+    codigoAsignatura INT NOT NULL,
+    FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
+);
+
+CREATE TABLE presenta(
+    IDEvaluacion INT,
+    CI BIGINT,
+    calificacion NUMERIC(5,2),
+    PRIMARY KEY (IDEvaluacion, CI),
+    FOREIGN KEY (IDEvaluacion) REFERENCES evaluacion(IDEvaluacion),
+    FOREIGN KEY (CI) REFERENCES estudiante(ciEstudiante)
+);
+
+-- =============================================
+-- 9. COMPRA E INVENTARIO
+-- =============================================
+CREATE TABLE compra(
+    IDSede INT,
+    IDRec INT,
+    IDProv INT,
+    fecha_adq DATE,
+    cantidad INT,
+    PRIMARY KEY (IDSede, IDRec, IDProv, fecha_adq),
+    FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec),
+    FOREIGN KEY (IDProv) REFERENCES proveedor(IDProv)
+);
+
+CREATE TABLE inventario(
+    IDSede INT,
+    IDRec INT,
+    cantidad_disponible INT,
+    PRIMARY KEY (IDSede, IDRec),
+    FOREIGN KEY (IDSede) REFERENCES sede_universitaria(IDSede),
+    FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
+);
+
+-- =============================================
+-- 10. TELÉFONOS
+-- =============================================
+CREATE TABLE telefono(
+    numero BIGINT,
+    ciPersona BIGINT,
+    PRIMARY KEY (numero, ciPersona),
+    FOREIGN KEY (ciPersona) REFERENCES persona(ci)
 );
