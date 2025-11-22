@@ -40,7 +40,7 @@ GROUP BY ra.nombre, s.nombre, p.nombre, i.cantidad_disponible
 ORDER BY indicador_uso DESC
 LIMIT 3;
 
---dConsulta D
+--Consulta D
 SELECT 
     p.ciProfesor,
     per.nombre,
@@ -78,11 +78,6 @@ HAVING COUNT(DISTINCT pe.IDPrograma) > 1
 ORDER BY programas_inscritos DESC, profesores_distintos DESC;
 
 
-
-
-
-
-
 --Consulta G
 SELECT p.ci, p.nombre, p.apellido, c.promedio
 FROM estudiante e
@@ -92,7 +87,7 @@ WHERE e.estado_ac = 'egresado'
   AND c.promedio >= 17.5;
 
 
--- CONSULTA F - VERSIÓN SIMPLIFICADA
+-- CONSULTA F 
 SELECT 
     f.num_factura,
     p.nombre || ' ' || p.apellido AS estudiante,

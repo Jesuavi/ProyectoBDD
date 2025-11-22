@@ -1,6 +1,6 @@
--- =============================================
+
 -- 1. TRIGGER PARA ACTUALIZAR INVENTARIO DESPUÉS DE UNA COMPRA
--- =============================================
+
 CREATE OR REPLACE FUNCTION actualizar_inventario()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -25,9 +25,9 @@ AFTER INSERT ON compra
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_inventario();
 
--- =============================================
+
 -- 2. TRIGGER PARA ACTUALIZAR ESTADO DEL ESTUDIANTE (EGRESADO)
--- =============================================
+
 CREATE OR REPLACE FUNCTION actualizar_estado_estudiante()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -58,9 +58,8 @@ AFTER INSERT OR UPDATE ON inscribe
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_estado_estudiante();
 
--- =============================================
 -- 3. TRIGGER PARA ACTUALIZAR ESTADO DE LA FACTURA
--- =============================================
+
 CREATE OR REPLACE FUNCTION actualizar_estado_factura()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -80,9 +79,8 @@ BEFORE INSERT OR UPDATE ON factura
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_estado_factura();
 
--- =============================================
 -- 4. TRIGGER PARA VALIDAR INSCRIPCIÓN (PREREQUISITOS Y DUPLICADOS)
--- =============================================
+
 CREATE OR REPLACE FUNCTION validar_inscripcion()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -129,9 +127,8 @@ BEFORE INSERT ON inscribe
 FOR EACH ROW
 EXECUTE FUNCTION validar_inscripcion();
 
--- =============================================
 -- 5. TRIGGER PARA VALIDAR SECCIÓN CON PROFESOR
--- =============================================
+
 CREATE OR REPLACE FUNCTION validar_seccion_profesor()
 RETURNS TRIGGER AS $$
 BEGIN
