@@ -1,8 +1,8 @@
--- SCRIPT COMPLETO DE INSERTS CORREGIDOS - SISTEMA DE GESTIÓN ACADÉMICA MULTISEDE
 
--- =============================================
+
+
 -- 1. PERSONAS
--- =============================================
+
 INSERT INTO persona (ci, nombre, apellido, fecha_nac, direccion, correo) VALUES
 -- Estudiantes
 (25500123, 'María', 'González', '2000-05-15', 'Av. Libertador', 'maria@email.com'),
@@ -21,18 +21,17 @@ INSERT INTO persona (ci, nombre, apellido, fecha_nac, direccion, correo) VALUES
 (40567890, 'José', 'González', '1970-06-20', 'Av. Libertador', 'jose@email.com'),
 (41789012, 'Marta', 'Pérez', '1972-09-15', 'Urb. El Paraíso', 'marta@email.com');
 
--- =============================================
 -- 2. ESTRUCTURA UNIVERSITARIA
--- =============================================
+
 
 INSERT INTO sede_universitaria (nombre, ubicacion, cantidad_labs, cantidad_oficinas, cantidad_aulas) VALUES
 ('Central', 'Caracas', 8, 25, 40),
 ('Litoral', 'La Guaira', 4, 12, 20),
 ('Oriente', 'Barcelona', 5, 15, 25);
 
--- =============================================
+
 -- 3. ESTUDIANTES, PERSONAL, PROFESORES
--- =============================================
+
 INSERT INTO estudiante (ciEstudiante, nro_carnet, sexo, estado_ac, parentesco, CIRep) VALUES
 (25500123, 2023001, 'femenino', 'activo', 'hija', 40567890),
 (26789234, 2023002, 'masculino', 'activo', 'hijo', 41789012),
@@ -57,9 +56,8 @@ INSERT INTO facultad (nombre, ci) VALUES
 
 INSERT INTO administrativo (ciAdmin) VALUES (18567012), (19478123);
 
--- =============================================
 -- 4. PROGRAMAS ACADÉMICOS
--- =============================================
+
 INSERT INTO programa_academico (nombre, modalidad, requisitos_ingreso, codigoFacultad, duracion) VALUES
 ('Ing. Informática', 'presencial', 'Bachillerato', 1, 10),
 ('Ing. Civil', 'presencial', 'Bachillerato', 1, 12),
@@ -73,9 +71,8 @@ INSERT INTO pregrado (IDPrograma) VALUES (1), (2), (5);
 INSERT INTO postgrado (IDPrograma, tipo) VALUES
 (3, 'maestria'), (4, 'doctorado'), (6, 'especializacion');
 
--- =============================================
 -- 5. ASIGNATURAS Y PLAN DE ESTUDIO
--- =============================================
+
 INSERT INTO asignatura (nombre, nro_creditos, tipo, fk_asignatura) VALUES
 -- Semestre 1
 ('Programación I', 4, 'practica', NULL),
@@ -96,9 +93,8 @@ INSERT INTO plan_estudio (IDPrograma, codigoAsignatura, es_obligatorio) VALUES
 (1, 4, true), (1, 5, true), (1, 6, true),
 (1, 7, true), (1, 8, true), (1, 9, true);
 
--- =============================================
 -- 6. CARGOS Y CONTRATOS
--- =============================================
+
 INSERT INTO cargo_admin (nombre) VALUES
 ('Profesor Titular'),
 ('Profesor Asociado'),
@@ -114,9 +110,8 @@ INSERT INTO contrato (IDSede, IDcargo, ciProfesor, codigoFacultad, salario, tipo
 (3, 4, 17234901, 3, 1500.00, 'por horas'),
 (1, 3, 17234901, 2, 1800.00, 'medio tiempo');
 
--- =============================================
 -- 7. PERÍODOS, HORARIOS, AULAS
--- =============================================
+
 INSERT INTO periodo_academico (periodo, trimestre, fecha_inicio, fecha_fin) VALUES
 ('2024-1', 1, '2024-01-15', '2024-04-15'),
 ('2024-2', 2, '2024-05-10', '2024-08-10'),
@@ -133,9 +128,8 @@ INSERT INTO aula (numero, tipo) VALUES
 (101, 'salon'), (102, 'salon'), (201, 'laboratorio'), 
 (202, 'laboratorio'), (301, 'auditorio');
 
--- =============================================
 -- 8. SECCIONES
--- =============================================
+
 INSERT INTO seccion (numero, codigoAsignatura, periodo, trimestre, capacidad, ciProfesor, hora_inicio, hora_fin, dia_semana, numero_aula) VALUES
 (1, 1, '2024-1', 1, 30, 15456789, '08:00', '10:00', 'Lunes', 101),
 (1, 2, '2024-1', 1, 35, 16345890, '10:30', '12:30', 'Lunes', 102),
@@ -143,9 +137,8 @@ INSERT INTO seccion (numero, codigoAsignatura, periodo, trimestre, capacidad, ci
 (1, 9, '2024-2', 2, 25, 17234901, '08:00', '10:00', 'Martes', 201),
 (2, 1, '2024-1', 1, 25, 15456789, '14:00', '16:00', 'Miércoles', 201);
 
--- =============================================
 -- 9. INSCRIPCIONES Y CURSA
--- =============================================
+
 INSERT INTO cursa (fecha_inicio, IDPrograma, ci, promedio) VALUES
 ('2024-01-15', 1, 25500123, 18.5),
 ('2024-01-15', 1, 26789234, 17.2),
@@ -158,9 +151,8 @@ INSERT INTO inscribe (numero, codigoAsignatura, periodo, trimestre, ci, fecha, e
 (1, 1, '2024-1', 1, 26789234, '2024-01-16', 'aprobado', 17),
 (1, 2, '2024-1', 1, 26789234, '2024-01-16', 'aprobado', 16);
 
--- =============================================
 -- 10. RECURSOS ACADÉMICOS
--- =============================================
+
 INSERT INTO recurso_academico (nombre, descripcion) VALUES
 ('Laptop Dell', 'Equipo lab programación'),
 ('Office 365', 'Suite ofimática'),
@@ -178,9 +170,8 @@ INSERT INTO libro (IDRec, ISBN, autor, editorial, edicion) VALUES
 
 INSERT INTO material_lab (IDRec, tipo) VALUES (4, 'Óptico');
 
--- =============================================
 -- 11. PROVEEDORES Y COMPRAS
--- =============================================
+
 INSERT INTO proveedor (nombre, ubicacion) VALUES
 ('TecnoSol', 'Caracas'),
 ('LibrosEduc', 'Valencia'),
@@ -192,9 +183,8 @@ INSERT INTO compra (IDSede, IDRec, IDProv, fecha_adq, cantidad) VALUES
 (1, 3, 2, '2024-01-15', 20),
 (1, 4, 1, '2024-01-20', 3);
 
--- =============================================
 -- 12. EMPRESAS Y FACTURAS
--- =============================================
+
 INSERT INTO empresa_patrocinadora (RIF, nombre, direccion, contacto, tipo_convenio) VALUES
 (123456789, 'TecnoCorp', 'Av. Principal', '0212-5551234', 'Educativo'),
 (987654321, 'EduFund', 'Centro Ciudad', '0212-5555678', 'Becas');
@@ -210,9 +200,8 @@ INSERT INTO factura (fecha, monto, estado, metodo, monto_pagado, rif, ciEstudian
 INSERT INTO emite (ci, num_factura) VALUES
 (18567012, 1), (19478123, 2);
 
--- =============================================
 -- 13. EVALUACIONES Y PRESENTACIONES
--- =============================================
+
 INSERT INTO evaluacion (ponderacion, tipo, descripcion, codigoAsignatura) VALUES
 (30.00, 'parcial', 'Primer parcial', 1),
 (40.00, 'practica', 'Proyecto lab', 1),
@@ -224,23 +213,19 @@ INSERT INTO presenta (IDEvaluacion, CI, calificacion) VALUES
 (2, 25500123, 19.0),
 (2, 26789234, 17.5);
 
--- =============================================
 -- 14. RELACIONES SEDE-FACULTAD
--- =============================================
+
 INSERT INTO sede_tiene_facultad (IDSede, codigoFacultad) VALUES
 (1, 1), (1, 2), (1, 3),
 (2, 1), (2, 2),
 (3, 1);
 
--- =============================================
 -- 15. TELÉFONOS
--- =============================================
+
 INSERT INTO telefono (numero, ciPersona) VALUES
 (4125551234, 25500123),
 (4145555678, 26789234),
 (4165559012, 15456789),
 (4245553456, 18567012);
 
--- =============================================
 -- FIN DEL SCRIPT
--- =============================================

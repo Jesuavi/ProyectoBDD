@@ -32,9 +32,9 @@ CREATE DOMAIN tipo_aula AS VARCHAR(20)
 CREATE DOMAIN sexo AS VARCHAR(20)
     CHECK (VALUE IN ('masculino','femenino','N/A'));
 
--- =============================================
+
 -- 1. PERSONAS, ESTUDIANTES, PERSONAL, PROFESORES
--- =============================================
+
 CREATE TABLE persona(
     ci BIGINT PRIMARY KEY,
     nombre VARCHAR(40) NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE persona(
 CREATE TABLE estudiante(
     ciEstudiante BIGINT PRIMARY KEY,
     nro_carnet BIGINT NOT NULL UNIQUE,
-    sexo VARCHAR(20) NOT NULL,       -- dominio original
-    estado_ac VARCHAR(15) NOT NULL,  -- dominio original
+    sexo VARCHAR(20) NOT NULL,       
+    estado_ac VARCHAR(15) NOT NULL,
     ciRep BIGINT,
     parentesco VARCHAR(20),
     FOREIGN KEY (ciEstudiante) REFERENCES persona(ci),
@@ -82,13 +82,13 @@ CREATE TABLE administrativo(
     FOREIGN KEY (ciAdmin) REFERENCES personal(ciPersonal)
 );
 
--- =============================================
+d
 -- 2. PROGRAMAS ACADÉMICOS
--- =============================================
+
 CREATE TABLE programa_academico(
     IDPrograma SERIAL PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL,
-    modalidad VARCHAR(20) NOT NULL, -- dominio original
+    modalidad VARCHAR(20) NOT NULL, 
     requisitos_ingreso VARCHAR(200),
     codigoFacultad INT NOT NULL,
     duracion INT NOT NULL,
@@ -102,13 +102,13 @@ CREATE TABLE pregrado(
 
 CREATE TABLE postgrado(
     IDPrograma INT PRIMARY KEY,
-    tipo VARCHAR(20) NOT NULL, -- dominio original
+    tipo VARCHAR(20) NOT NULL, 
     FOREIGN KEY (IDPrograma) REFERENCES programa_academico(IDPrograma)
 );
 
--- =============================================
+
 -- 3. SEDE UNIVERSITARIA
--- =============================================
+
 CREATE TABLE sede_universitaria(
     IDSede SERIAL PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL,
@@ -126,9 +126,9 @@ CREATE TABLE sede_tiene_facultad(
     FOREIGN KEY (codigoFacultad) REFERENCES facultad(codigoFacultad)
 );
 
--- =============================================
+
 -- 4. RECURSOS ACADÉMICOS
--- =============================================
+
 CREATE TABLE recurso_academico(
     IDRec SERIAL PRIMARY KEY,
     nombre VARCHAR(60) NOT NULL,
@@ -167,9 +167,9 @@ CREATE TABLE material_lab(
     FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
--- =============================================
+
 -- 5. PROVEEDOR, EMPRESA Y FACTURA
--- =============================================
+
 CREATE TABLE proveedor(
     IDProv SERIAL PRIMARY KEY,
     nombre VARCHAR(60),
@@ -188,8 +188,8 @@ CREATE TABLE factura(
     num_factura SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
     monto NUMERIC(10,2) NOT NULL,
-    estado VARCHAR(20), -- dominio original
-    metodo VARCHAR(20), -- dominio original
+    estado VARCHAR(20),
+    metodo VARCHAR(20), 
     monto_pagado NUMERIC(10,2) DEFAULT 0,
     rif BIGINT,
     ciEstudiante BIGINT NOT NULL,
@@ -205,9 +205,9 @@ CREATE TABLE emite(
     FOREIGN KEY (num_factura) REFERENCES factura(num_factura)
 );
 
--- =============================================
+
 -- 6. CARGOS, CONTRATOS Y ASIGNATURAS
--- =============================================
+
 CREATE TABLE cargo_admin(
     IDcargo SERIAL PRIMARY KEY,
     nombre VARCHAR(40)
@@ -231,7 +231,7 @@ CREATE TABLE asignatura(
     codigoAsignatura SERIAL PRIMARY KEY,
     nombre VARCHAR(60),
     nro_creditos INT NOT NULL,
-    tipo VARCHAR(15), -- dominio original
+    tipo VARCHAR(15),
     fk_asignatura INT,
     FOREIGN KEY (fk_asignatura) REFERENCES asignatura(codigoAsignatura)
 );
@@ -245,9 +245,9 @@ CREATE TABLE plan_estudio(
     FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
 );
 
--- =============================================
+
 -- 7. PERÍODOS, HORARIO, AULA, SECCIÓN
--- =============================================
+
 CREATE TABLE periodo_academico(
     periodo VARCHAR(20),
     trimestre INT,
@@ -265,7 +265,7 @@ CREATE TABLE horario(
 
 CREATE TABLE aula(
     numero INT PRIMARY KEY,
-    tipo VARCHAR(20) -- dominio original
+    tipo VARCHAR(20) 
 );
 
 CREATE TABLE seccion(
@@ -287,9 +287,9 @@ CREATE TABLE seccion(
     FOREIGN KEY (numero_aula) REFERENCES aula(numero)
 );
 
--- =============================================
+
 -- 8. INSCRIPCIONES, CURSA Y EVALUACIONES
--- =============================================
+
 CREATE TABLE cursa(
     fecha_inicio DATE,
     IDPrograma INT,
@@ -307,7 +307,7 @@ CREATE TABLE inscribe(
     trimestre INT,
     ci BIGINT,
     fecha DATE,
-    estado_ins VARCHAR(20), -- dominio original
+    estado_ins VARCHAR(20), 
     calificacion_final NUMERIC(5,2),
     PRIMARY KEY (numero, codigoAsignatura, periodo, trimestre, ci),
     FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura),
@@ -318,7 +318,7 @@ CREATE TABLE inscribe(
 CREATE TABLE evaluacion(
     IDEvaluacion SERIAL PRIMARY KEY,
     ponderacion NUMERIC(5,2),
-    tipo VARCHAR(20), -- dominio original
+    tipo VARCHAR(20), 
     descripcion VARCHAR(200),
     codigoAsignatura INT NOT NULL,
     FOREIGN KEY (codigoAsignatura) REFERENCES asignatura(codigoAsignatura)
@@ -333,9 +333,9 @@ CREATE TABLE presenta(
     FOREIGN KEY (CI) REFERENCES estudiante(ciEstudiante)
 );
 
--- =============================================
+
 -- 9. COMPRA E INVENTARIO
--- =============================================
+
 CREATE TABLE compra(
     IDSede INT,
     IDRec INT,
@@ -357,9 +357,9 @@ CREATE TABLE inventario(
     FOREIGN KEY (IDRec) REFERENCES recurso_academico(IDRec)
 );
 
--- =============================================
+
 -- 10. TELÉFONOS
--- =============================================
+
 CREATE TABLE telefono(
     numero BIGINT,
     ciPersona BIGINT,
