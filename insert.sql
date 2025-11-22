@@ -6,6 +6,8 @@
 INSERT INTO persona (ci, nombre, apellido, fecha_nac, direccion, correo) VALUES
 -- Estudiantes
 (25500123, 'María', 'González', '2000-05-15', 'Av. Libertador', 'maria@email.com'),
+(44567890, 'Juan', 'Pérez', '2001-08-30', 'El Paraíso', 'juan.perez@email.com'),
+(33567890, 'Ana', 'Morales', '1999-03-15', 'Los Naranjos', 'ana.morales@email.com'),
 (26789234, 'Carlos', 'Pérez', '2001-08-22', 'Urb. El Paraíso', 'carlos@email.com'),
 (28956345, 'Ana', 'Rodríguez', '1999-12-10', 'La Candelaria', 'ana@email.com'),
 (30123456, 'Luis', 'Martínez', '2002-03-30', 'Chacao', 'luis@email.com'),
@@ -34,7 +36,9 @@ INSERT INTO sede_universitaria (nombre, ubicacion, cantidad_labs, cantidad_ofici
 -- 3. ESTUDIANTES, PERSONAL, PROFESORES
 -- =============================================
 INSERT INTO estudiante (ciEstudiante, nro_carnet, sexo, estado_ac, parentesco, CIRep) VALUES
+(44567890, 2024001, 'masculino', 'activo', 'hijo', 41789012),
 (25500123, 2023001, 'femenino', 'activo', 'hija', 40567890),
+(33567890, 2023006, 'femenino', 'egresado', 'hija', 40567890),
 (26789234, 2023002, 'masculino', 'activo', 'hijo', 41789012),
 (28956345, 2023003, 'femenino', 'activo', 'hija', 40567890),
 (30123456, 2023004, 'masculino', 'activo', 'hijo', 41789012),
@@ -148,12 +152,14 @@ INSERT INTO seccion (numero, codigoAsignatura, periodo, trimestre, capacidad, ci
 -- =============================================
 INSERT INTO cursa (fecha_inicio, IDPrograma, ci, promedio) VALUES
 ('2024-01-15', 1, 25500123, 18.5),
+('2023-01-15', 1, 33567890, 18.7),
 ('2024-01-15', 1, 26789234, 17.2),
 ('2024-01-15', 1, 28956345, 16.8);
 
 INSERT INTO inscribe (numero, codigoAsignatura, periodo, trimestre, ci, fecha, estado_ins, calificacion_final) VALUES
 -- Semestre 1 - sin prerequisitos
 (1, 1, '2024-1', 1, 25500123, '2024-01-16', 'aprobado', 19),
+(1, 2, '2024-1', 1, 44567890, CURRENT_DATE - INTERVAL '3 months', 'reprobado', 5),
 (1, 2, '2024-1', 1, 25500123, '2024-01-16', 'aprobado', 18),
 (1, 1, '2024-1', 1, 26789234, '2024-01-16', 'aprobado', 17),
 (1, 2, '2024-1', 1, 26789234, '2024-01-16', 'aprobado', 16);
@@ -241,6 +247,7 @@ INSERT INTO telefono (numero, ciPersona) VALUES
 (4165559012, 15456789),
 (4245553456, 18567012);
 
--- =============================================
+-- ===========================================
 -- FIN DEL SCRIPT
 -- =============================================
+
