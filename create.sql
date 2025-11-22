@@ -82,7 +82,7 @@ CREATE TABLE administrativo(
     FOREIGN KEY (ciAdmin) REFERENCES personal(ciPersonal)
 );
 
-d
+
 -- 2. PROGRAMAS ACADÉMICOS
 
 CREATE TABLE programa_academico(
